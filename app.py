@@ -6,16 +6,16 @@ from flask import Flask, request, jsonify, send_from_directory, render_template,
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
 import secrets
-
+import sys
 filesizeMB = 500
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 app.config['MAX_CONTENT_LENGTH'] = filesizeMB * 1024 * 1024
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-CLIENTS_FOLDER = 'client_cache'
-CLIENTFOLDERS_FILE = 'clientfolders.json'
+script_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+CLIENTS_FOLDER = script_path + '/client_cache'
+CLIENTFOLDERS_FILE = script_path + '/clientfolders.json'
 
 if os.path.exists(CLIENTS_FOLDER):
     shutil.rmtree(CLIENTS_FOLDER)
