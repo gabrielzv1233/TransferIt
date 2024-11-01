@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TransferIt - Host</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Base styling with specified colors */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #212121;
+            color: #ECECEC;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #444654;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #2F2F2F;
+            width: 280px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #qr-code {
+            margin: 10px 0;
+            width: 192px;
+            height: 192px;
+        }
+        .divider {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #888;
+        }
+        #link-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        #link {
+            border: 1px solid #444654;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 14px;
+            color: #ECECEC;
+            background-color: #2A2A2A;
+            flex-grow: 1;
+            max-width: calc(100% - 40px);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        #link:focus {
+            border-color: #10a37f;
+        }
+        .copy-btn {
+            padding: 8px;
+            font-size: 18px;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 40px;
+        }
+        .copy-btn:hover {
+            background-color: #e6e6e6;
+        }
+        #file-list {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #2A2A2A;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #444654;
+            font-family: monospace;
+            color: #ECECEC;
+            font-size: 14px;
+            overflow-y: auto;
+            max-height: 150px;
+        }
+        .file-box {
+            padding: 8px;
+            border-bottom: 1px solid #444654;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-box:last-child {
+            border-bottom: none;
+        }
+        .download-link {
+            color: #10a37f;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Scan QR code to connect:</p>
+        <div id="qr-code"></div>
+        
+        <div class="divider">-- OR --</div>
+
+        <div id="link-container">
+            <input id="link" type="text" readonly>
+            <button class="copy-btn" onclick="copyLink()">🗋</button>
+        </div>
+
+        <div id="file-list" style="display: none;">
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const linkUuid = "{{ link_uuid }}";
+        const clientLink = `${window.location.origin}/client/${linkUuid}`;
+        const linkInput = document.getElementById("link");
+        linkInput.value = clientLink;
+    
+        new QRCode(document.getElementById("qr-code"), {
+            text: clientLink,
+            width: 192,
+            height: 192
+        });
+    
+        socket.emit('connect_to_room', { link_uuid: linkUuid });
+    
+        socket.on('file_received', (file) => {
+            console.log("File received event:", file);
+            refreshFileList();
+        });
+    
+        function copyLink() {
+            const linkInput = document.getElementById("link");
+            linkInput.select();
+            document.execCommand("copy");
+    
+            const copyButton = document.querySelector(".copy-btn");
+            copyButton.innerText = "✓";
+            setTimeout(() => {
+                copyButton.innerText = "🗋";
+            }, 3000);
+        }
+    
+        async function refreshFileList() {
+            try {
+                const response = await fetch(`/files/${linkUuid}/list`);
+                if (!response.ok) {
+                    console.error("Failed to fetch file list:", response.statusText);
+                    return;
+                }
+                const fileList = await response.json();
+                console.log("File list fetched:", fileList);
+                updateFileList(fileList);
+            } catch (error) {
+                console.error("Error refreshing file list:", error);
+            }
+        }
+    
+        refreshFileList();
+        setInterval(refreshFileList, 5000);s
+    
+        function updateFileList(files) {
+            const fileListContainer = document.getElementById("file-list");
+
+            if (files.length === 0) {
+                fileListContainer.style.display = "none";
+            } else {
+                fileListContainer.style.display = "block";
+            }
+
+            fileListContainer.innerHTML = '';
+    
+            files.forEach(file => {
+                const fileDiv = document.createElement("div");
+                fileDiv.className = "file-box";
+    
+                const downloadFilename = file.ext ? `${file.id}.${file.ext}` : file.id;
+    
+                fileDiv.innerHTML = `
+                    <span>${file.name}</span>
+                    <a href="/files/${linkUuid}/${downloadFilename}" target="_blank" download="${file.name}" class="download-link">Download</a>
+                `;
+                fileListContainer.appendChild(fileDiv);
+            });
+        }
+    </script>
+</body>
+</html>

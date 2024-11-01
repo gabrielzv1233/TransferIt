@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TransferIt</title>
+    <style>
+        /* Base styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #212121;
+            font-family: Arial, sans-serif;
+            color: #ECECEC;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #444654;
+            border-radius: 8px;
+            padding: 10px 20px;
+            background-color: #2F2F2F;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #ECECEC;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #212121;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #e6e6e6;
+        }
+
+        button:active {
+            background-color: #d4d4d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TransferIt</h2>
+        <button onclick="createHost()">Host a connection</button>
+    </div>
+
+    <script>
+        async function createHost() {
+            const response = await fetch('/generate_link', { method: 'POST' });
+            const data = await response.json();
+            window.location.href = data.link;
+        }
+    </script>
+</body>
+</html>

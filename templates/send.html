@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TransferIt - Client</title>
+    <style>
+        /* Base styling for the body and container */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #212121;
+            color: #ECECEC;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #444654;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #2F2F2F;
+            width: 320px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Center and style file input */
+        #file-input {
+            border: 1px solid #444654;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #2A2A2A;
+            color: #ECECEC;
+            margin-top: 10px;
+            width: calc(100% - 20px);
+            cursor: pointer;
+            outline: none;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        #file-input:hover {
+            border-color: #10a37f;
+        }
+
+        /* Center and style upload button */
+        .upload-btn {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #ffffff;
+            color: #212121;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .upload-btn:hover {
+            background-color: #e6e6e6;
+        }
+
+        .upload-btn:active {
+            background-color: #d4d4d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Select Files to transfer</h2>
+        <form id="file-form" enctype="multipart/form-data" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <input type="file" id="file-input" name="file" multiple>
+            <button type="button" class="upload-btn" onclick="uploadFiles()">Upload Files</button>
+        </form>
+    </div>
+
+    <script>
+        async function uploadFiles() {
+            const files = document.getElementById("file-input").files;
+            const linkUuid = "{{ link_uuid }}";
+            const uploadButton = document.querySelector(".upload-btn");
+
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                await fetch(`/upload/${linkUuid}`, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          uploadButton.textContent = "Uploaded";
+                          setTimeout(() => {
+                              uploadButton.textContent = "Upload Files";
+                          }, 3000);
+                      } else {
+                          uploadButton.textContent = "Failed";
+                          alert("Upload failed. Please check the console for errors.");
+                          uploadButton.textContent = "Upload Files";
+                      }
+                  }).catch(err => {
+                      console.error(err);
+                      uploadButton.textContent = "Failed";
+                      alert("Upload failed. Please check the console for errors.");
+                      uploadButton.textContent = "Upload Files";
+                  });
+            }
+        }
+    </script>
+</body>
+</html>
