@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, send_from_directory, render_template,
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
 import secrets
+import random
 import sys
 filesizeMB = 500
 
@@ -29,22 +30,44 @@ if not os.path.exists(CLIENTFOLDERS_FILE):
 def main_page():
     return render_template('index.html')
 
+def generate_short_uuid():
+    # Generate a UUIDv4 and take only the first 8 characters
+    short_uuid = str(uuid.uuid4())[:8]
+    
+    # Convert it to a 6-character string by removing two random characters
+    short_uuid = ''.join(random.sample(short_uuid, 6))
+    
+    # Randomize the casing of each character to increase randomness
+    randomized_uuid = ''.join(
+        char.upper() if random.choice([True, False]) else char.lower() 
+        for char in short_uuid
+    )
+    
+    return randomized_uuid
+
 @app.route('/generate_link', methods=['POST'])
 def generate_link():
-    link_uuid = str(uuid.uuid4())
+    # Use the shortened UUID
+    link_uuid = generate_short_uuid()
+    
+    # Create a folder path for the client using the shortened UUID
     client_folder_path = os.path.join(CLIENTS_FOLDER, link_uuid)
-
     os.makedirs(client_folder_path, exist_ok=True)
     print(f"[DEBUG] Created client folder: {client_folder_path}")
 
+    # Update client folders list
     with open(CLIENTFOLDERS_FILE, 'r') as f:
         client_folders = json.load(f)
     client_folders.append(link_uuid)
     with open(CLIENTFOLDERS_FILE, 'w') as f:
         json.dump(client_folders, f)
 
+    # Generate the client link and host link
     client_link = url_for('receive_file', link_uuid=link_uuid, _external=True)
-    return jsonify({'link': url_for('host', link_uuid=link_uuid, _external=True), 'client_link': client_link})
+    return jsonify({
+        'link': url_for('host', link_uuid=link_uuid, _external=True),
+        'client_link': client_link
+    })
 
 @app.route('/host/<link_uuid>')
 def host(link_uuid):
