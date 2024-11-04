@@ -1,8 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>TransferIt</title>
+    <link rel="icon" href="{{ url_for('static', filename='icon64.png') }}" type="image/png">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransferIt - Host</title>
+    <meta name="description" content="A simple and fast way to transfer files between devices">
+    <meta name="keywords" content="file transfer, files, gabrielzv1233">
+    <meta name="author" content="Gabrielzv1233">
+    <meta name="theme-color" content="#212121">
+    <meta property="og:title" content="TransferIt">
+    <meta property="og:description" content="A simple and fast way to transfer files between devices">
+    <meta property="og:url" content="https://TransferIt.gabrielzv1233.net">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TransferIt">
+    <meta name="twitter:description" content="A simple and fast way to transfer files between devices">
+    <meta name="application-name" content="TransferIt">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         /* Base styling with specified colors */
@@ -16,6 +29,10 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 10px;
         }
         .container {
             display: flex;

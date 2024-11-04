@@ -17,6 +17,7 @@
     <meta name="twitter:description" content="A simple and fast way to transfer files between devices">
     <meta name="application-name" content="TransferIt">
     <style>
+        /* Base styling */
         body {
             display: flex;
             justify-content: center;
@@ -50,7 +51,6 @@
         }
 
         button {
-            margin-bottom: 10px;
             padding: 10px 20px;
             font-size: 1em;
             color: #212121;
@@ -61,6 +61,7 @@
             transition: background-color 0.3s ease;
             outline: none;
             width: 100%;
+            margin-bottom: 10px;
         }
 
         button:hover {
@@ -74,16 +75,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>TransferIt</h2>
-        <button onclick="createHost()">Host a connection</button>
+        <h2>Hmm... This link doesn't exist.</h2>
+        <button onclick="window.location.href = '/'">Go Home</button>
     </div>
-
-    <script>
-        async function createHost() {
-            const response = await fetch('/generate_link', { method: 'POST' });
-            const data = await response.json();
-            window.location.href = data.link;
-        }
-    </script>
 </body>
 </html>

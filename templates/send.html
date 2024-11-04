@@ -1,8 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>TransferIt</title>
+    <link rel="icon" href="{{ url_for('static', filename='icon64.png') }}" type="image/png">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransferIt - Client</title>
+    <meta name="description" content="A simple and fast way to transfer files between devices">
+    <meta name="keywords" content="file transfer, files, gabrielzv1233">
+    <meta name="author" content="Gabrielzv1233">
+    <meta name="theme-color" content="#212121">
+    <meta property="og:title" content="TransferIt">
+    <meta property="og:description" content="A simple and fast way to transfer files between devices">
+    <meta property="og:url" content="https://TransferIt.gabrielzv1233.net">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TransferIt">
+    <meta name="twitter:description" content="A simple and fast way to transfer files between devices">
+    <meta name="application-name" content="TransferIt">
     <style>
         /* Base styling for the body and container */
         body {
@@ -88,7 +101,8 @@
 
     <script>
         async function uploadFiles() {
-            const files = document.getElementById("file-input").files;
+            const fileInput = document.getElementById("file-input");
+            const files = fileInput.files;
             const linkUuid = "{{ link_uuid }}";
             const uploadButton = document.querySelector(".upload-btn");
 
@@ -118,6 +132,9 @@
                       uploadButton.textContent = "Upload Files";
                   });
             }
+            
+            // Clear file input after uploading files
+            fileInput.value = "";
         }
     </script>
 </body>
