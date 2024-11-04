@@ -44,6 +44,7 @@
             background-color: #2F2F2F;
             width: 280px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
         #qr-code {
             margin: 10px 0;
@@ -117,6 +118,24 @@
             text-decoration: none;
             font-size: 14px;
         }
+        .end-session-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #212121;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+            width: 100%;
+        }
+        .end-session-btn:hover {
+            background-color: #e6e6e6;
+        }
+        .end-session-btn:active {
+            background-color: #d4d4d4;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +154,10 @@
         </div>
     </div>
 
+    <div class="container">
+        <button class="end-session-btn" onclick="window.location.href = `/end_session/${linkUuid}`">End Session</button>
+    </div>
+
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
         const socket = io();
@@ -143,6 +166,13 @@
         const linkInput = document.getElementById("link");
         linkInput.value = clientLink;
     
+        document.querySelector('.end-session-btn').onclick = function () {
+            const confirmEnd = confirm("Are you sure you want to end the session? All files uploaded will no longer be available.");
+            if (confirmEnd) {
+                window.location.href = `/end_session/${linkUuid}`;
+            }
+        };        
+
         new QRCode(document.getElementById("qr-code"), {
             text: clientLink,
             width: 192,
@@ -167,7 +197,7 @@
                 copyButton.innerText = "🗋";
             }, 3000);
         }
-    
+        
         async function refreshFileList() {
             try {
                 const response = await fetch(`/files/${linkUuid}/list`);
@@ -184,7 +214,7 @@
         }
     
         refreshFileList();
-        setInterval(refreshFileList, 5000);s
+        setInterval(refreshFileList, 5000);
     
         function updateFileList(files) {
             const fileListContainer = document.getElementById("file-list");
