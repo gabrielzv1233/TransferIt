@@ -121,8 +121,8 @@ def download_file(link_uuid, filename):
 
 @app.route('/upload/<link_uuid>', methods=['POST'])
 def upload_file(link_uuid):
-    if not is_allowed_link(link_uuid):
-        return render_template('no_access.html'), 403
+    if not is_valid_link(link_uuid):
+        return render_template('invalid_link.html'), 404
     client_path = os.path.join(CLIENTS_FOLDER, link_uuid)
     if not os.path.exists(client_path):
         os.makedirs(client_path)
