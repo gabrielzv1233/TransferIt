@@ -1,16 +1,16 @@
-import os
-import uuid
-import json
-import shutil
-from datetime import timedelta
-from flask import Flask, request, jsonify, send_from_directory, render_template, url_for, abort, redirect, make_response, session
+from flask import Flask, request, jsonify, send_from_directory, render_template, url_for, redirect, session
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
+from datetime import timedelta
 import secrets
 import random
+import shutil
+import json
+import uuid
 import sys
+import os
 
-filesizeMB = 500
+filesizeMB = 50000
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
