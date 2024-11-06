@@ -10,7 +10,7 @@ import uuid
 import sys
 import os
 
-filesizeMB = 50000
+filesizeMB = 500
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
