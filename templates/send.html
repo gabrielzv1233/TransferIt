@@ -29,11 +29,9 @@
             height: 100vh;
             margin: 0;
         }
-
         h2 {
             margin: 0;
         }
-
         .container {
             display: flex;
             flex-direction: column;
@@ -46,8 +44,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
-
-        /* Center and style file input */
         #file-input {
             border: 1px solid #444654;
             border-radius: 5px;
@@ -61,12 +57,9 @@
             font-size: 14px;
             text-align: center;
         }
-
         #file-input:hover {
             border-color: #10a37f;
         }
-
-        /* Center and style upload button */
         .upload-btn {
             padding: 10px;
             font-size: 16px;
@@ -80,13 +73,15 @@
             margin-top: 15px;
             text-align: center;
         }
-
         .upload-btn:hover {
             background-color: #e6e6e6;
         }
-
         .upload-btn:active {
             background-color: #d4d4d4;
+        }
+        #error-message {
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -96,6 +91,7 @@
         <form id="file-form" enctype="multipart/form-data" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
             <input type="file" id="file-input" name="file" multiple>
             <button type="button" class="upload-btn" onclick="uploadFiles()">Upload Files</button>
+            <div id="error-message"></div> <!-- Error message element -->
         </form>
     </div>
 
@@ -105,34 +101,44 @@
             const files = fileInput.files;
             const linkUuid = "{{ link_uuid }}";
             const uploadButton = document.querySelector(".upload-btn");
+            const errorMessage = document.getElementById("error-message");
+
+            errorMessage.textContent = ""; // Clear any previous error messages
 
             for (let file of files) {
                 const formData = new FormData();
                 formData.append('file', file);
 
-                await fetch(`/upload/${linkUuid}`, {
-                    method: 'POST',
-                    body: formData
-                }).then(response => response.json())
-                  .then(data => {
-                      if (data.success) {
-                          uploadButton.textContent = "Uploaded";
-                          setTimeout(() => {
-                              uploadButton.textContent = "Upload Files";
-                          }, 3000);
-                      } else {
-                          uploadButton.textContent = "Failed";
-                          alert("Upload failed. Please check the console for errors.");
-                          uploadButton.textContent = "Upload Files";
-                      }
-                  }).catch(err => {
-                      console.error(err);
-                      uploadButton.textContent = "Failed";
-                      alert("Upload failed. Please check the console for errors.");
-                      uploadButton.textContent = "Upload Files";
-                  });
+                try {
+                    const response = await fetch(`/upload/${linkUuid}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || "Failed to upload file.");
+                    }
+
+                    if (data.success) {
+                        uploadButton.textContent = "Uploaded";
+                        setTimeout(() => {
+                            uploadButton.textContent = "Upload Files";
+                        }, 3000);
+                    } else {
+                        throw new Error("Upload failed. Please try again.");
+                    }
+                } catch (err) {
+                    errorMessage.textContent = err.message;
+                    console.error(err);
+                    uploadButton.textContent = "Failed";
+                    setTimeout(() => {
+                        uploadButton.textContent = "Upload Files";
+                    }, 3000);
+                }
             }
-            
+
             // Clear file input after uploading files
             fileInput.value = "";
         }

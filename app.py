@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template, url_for, redirect, session
+from werkzeug.exceptions import RequestEntityTooLarge
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
 from datetime import timedelta
@@ -33,6 +34,10 @@ if not os.path.exists(CLIENTFOLDERS_FILE):
 @app.route('/')
 def main_page():
     return render_template('index.html')
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return jsonify({"error": f"File is too large. The maximum allowed size is {filesizeMB} MB."}), 413
 
 def generate_short_uuid():
     short_uuid = str(uuid.uuid4())[:8]
