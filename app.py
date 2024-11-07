@@ -35,10 +35,6 @@ if not os.path.exists(CLIENTFOLDERS_FILE):
 def main_page():
     return render_template('index.html')
 
-@app.route('/googlef2e8053b928e829b.html')
-def gsearchv():
-    return "google-site-verification: googlef2e8053b928e829b.html"
-
 @app.errorhandler(RequestEntityTooLarge)
 def handle_file_too_large(e):
     return jsonify({"error": f"File is too large. The maximum allowed size is {filesizeMB} MB."}), 413
